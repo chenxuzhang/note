@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.aop.Pointcut</OriginalElement>
+  <nodes>
+    <node x="-910.0" y="-148.0">org.springframework.aop.Pointcut</node>
+    <node x="-880.0" y="-48.0">org.springframework.aop.support.ExpressionPointcut</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.aop.support.ExpressionPointcut" target="org.springframework.aop.Pointcut" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="-783.0" y="-96.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="-308.0" y="66.0" />
+  <SelectedNodes>
+    <node>org.springframework.aop.Pointcut</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

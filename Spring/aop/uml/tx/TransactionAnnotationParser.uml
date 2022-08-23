@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.transaction.annotation.TransactionAnnotationParser</OriginalElement>
+  <nodes>
+    <node x="761.7258064516129" y="-207.41249142072758">org.springframework.transaction.annotation.TransactionAnnotationParser</node>
+    <node x="146.22580645161293" y="-129.41249142072758">org.springframework.transaction.annotation.Ejb3TransactionAnnotationParser</node>
+    <node x="653.2258064516129" y="-129.41249142072758">org.springframework.transaction.annotation.JtaTransactionAnnotationParser</node>
+    <node x="1155.225806451613" y="-129.41249142072758">org.springframework.transaction.annotation.SpringTransactionAnnotationParser</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.transaction.annotation.Ejb3TransactionAnnotationParser" target="org.springframework.transaction.annotation.TransactionAnnotationParser" relationship="REALIZATION">
+      <point x="0.0" y="-70.5" />
+      <point x="389.7258064516129" y="-154.41249142072758" />
+      <point x="894.2258064516129" y="-154.41249142072758" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.transaction.annotation.SpringTransactionAnnotationParser" target="org.springframework.transaction.annotation.TransactionAnnotationParser" relationship="REALIZATION">
+      <point x="0.0" y="-70.5" />
+      <point x="1396.225806451613" y="-154.41249142072758" />
+      <point x="894.2258064516129" y="-154.41249142072758" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.transaction.annotation.JtaTransactionAnnotationParser" target="org.springframework.transaction.annotation.TransactionAnnotationParser" relationship="REALIZATION">
+      <point x="0.0" y="-70.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.9642620780939775" showDependencies="false" x="963.8016472203158" y="109.5" />
+  <SelectedNodes>
+    <node>org.springframework.transaction.annotation.TransactionAnnotationParser</node>
+    <node>org.springframework.transaction.annotation.Ejb3TransactionAnnotationParser</node>
+    <node>org.springframework.transaction.annotation.JtaTransactionAnnotationParser</node>
+    <node>org.springframework.transaction.annotation.SpringTransactionAnnotationParser</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

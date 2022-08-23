@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.transaction.interceptor.TransactionAttributeSource</OriginalElement>
+  <nodes>
+    <node x="61.5" y="379.0">org.springframework.transaction.annotation.AnnotationTransactionAttributeSource</node>
+    <node x="1434.0" y="111.0">org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource</node>
+    <node x="0.0" y="177.0">org.springframework.transaction.interceptor.AbstractFallbackTransactionAttributeSource</node>
+    <node x="1058.0" y="0.0">org.springframework.transaction.interceptor.TransactionAttributeSource</node>
+    <node x="1911.9999999999998" y="78.0">org.springframework.transaction.interceptor.MethodMapTransactionAttributeSource</node>
+    <node x="478.0" y="155.0">org.springframework.transaction.interceptor.CompositeTransactionAttributeSource</node>
+    <node x="956.0" y="133.0">org.springframework.transaction.interceptor.MatchAlwaysTransactionAttributeSource</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.transaction.interceptor.MatchAlwaysTransactionAttributeSource" target="org.springframework.transaction.interceptor.TransactionAttributeSource" relationship="REALIZATION">
+      <point x="0.0" y="-70.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource" target="org.springframework.transaction.interceptor.AbstractFallbackTransactionAttributeSource" relationship="GENERALIZATION">
+      <point x="0.0" y="-48.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.springframework.transaction.interceptor.CompositeTransactionAttributeSource" target="org.springframework.transaction.interceptor.TransactionAttributeSource" relationship="REALIZATION">
+      <point x="0.0" y="-48.5" />
+      <point x="707.0" y="53.0" />
+      <point x="1185.0" y="53.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.transaction.interceptor.MethodMapTransactionAttributeSource" target="org.springframework.transaction.interceptor.TransactionAttributeSource" relationship="REALIZATION">
+      <point x="0.0" y="-125.5" />
+      <point x="2149.0" y="53.0" />
+      <point x="1185.0" y="53.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.transaction.interceptor.NameMatchTransactionAttributeSource" target="org.springframework.transaction.interceptor.TransactionAttributeSource" relationship="REALIZATION">
+      <point x="0.0" y="-92.5" />
+      <point x="1663.0" y="53.0" />
+      <point x="1185.0" y="53.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.transaction.interceptor.AbstractFallbackTransactionAttributeSource" target="org.springframework.transaction.interceptor.TransactionAttributeSource" relationship="REALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="229.0" y="53.0" />
+      <point x="1185.0" y="53.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.7555694098088114" showDependencies="false" x="1232.7713295560811" y="264.97370592441825" />
+  <SelectedNodes>
+    <node>org.springframework.transaction.annotation.AnnotationTransactionAttributeSource</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

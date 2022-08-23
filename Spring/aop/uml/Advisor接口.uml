@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.aop.Advisor</OriginalElement>
+  <nodes>
+    <node x="547.5" y="173.0">org.springframework.aop.PointcutAdvisor</node>
+    <node x="824.0" y="259.0">org.springframework.aop.IntroductionAdvisor</node>
+    <node x="464.0" y="259.0">org.springframework.aop.aspectj.InstantiationModelAwarePointcutAdvisor</node>
+    <node x="733.0" y="65.0">org.springframework.aop.Advisor</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.aop.IntroductionAdvisor" target="org.springframework.aop.Advisor" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="928.0" y="163.75" />
+      <point x="829.5" y="163.75" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.aspectj.InstantiationModelAwarePointcutAdvisor" target="org.springframework.aop.PointcutAdvisor" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.springframework.aop.PointcutAdvisor" target="org.springframework.aop.Advisor" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="640.5" y="163.75" />
+      <point x="829.5" y="163.75" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="948.0" y="301.0" />
+  <SelectedNodes>
+    <node>org.springframework.aop.Advisor</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

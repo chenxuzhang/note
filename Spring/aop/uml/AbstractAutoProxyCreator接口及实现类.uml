@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator</OriginalElement>
+  <nodes>
+    <node x="332.5" y="686.0">org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator</node>
+    <node x="308.0" y="764.0">org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator</node>
+    <node x="695.5" y="686.0">org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator</node>
+    <node x="532.75" y="583.0">org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator</node>
+    <node x="440.75" y="137.0">org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator" target="org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator" relationship="GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator" target="org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="504.0" y="661.0" />
+      <point x="684.25" y="661.0" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator" target="org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator" relationship="GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="864.5" y="661.0" />
+      <point x="684.25" y="661.0" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator" target="org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator" relationship="GENERALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="773.0" y="518.0" />
+  <SelectedNodes>
+    <node>org.springframework.aop.aspectj.autoproxy.AspectJAwareAdvisorAutoProxyCreator</node>
+    <node>org.springframework.aop.aspectj.annotation.AnnotationAwareAspectJAutoProxyCreator</node>
+    <node>org.springframework.aop.framework.autoproxy.InfrastructureAdvisorAutoProxyCreator</node>
+    <node>org.springframework.aop.framework.autoproxy.AbstractAdvisorAutoProxyCreator</node>
+    <node>org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>public</VISIBILITY>
+</Diagram>
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.aop.framework.AdvisorChainFactory</OriginalElement>
+  <nodes>
+    <node x="0.0" y="78.0">org.springframework.aop.framework.DefaultAdvisorChainFactory</node>
+    <node x="198.0" y="0.0">org.springframework.aop.framework.AdvisorChainFactory</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.aop.framework.DefaultAdvisorChainFactory" target="org.springframework.aop.framework.AdvisorChainFactory" relationship="REALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="300.0" y="76.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.aop.MethodMatcher</OriginalElement>
+  <nodes>
+    <node x="731.5" y="53.0">org.springframework.aop.support.DynamicMethodMatcher</node>
+    <node x="1034.0" y="53.0">org.springframework.aop.IntroductionAwareMethodMatcher</node>
+    <node x="353.0" y="50.0">org.springframework.aop.support.StaticMethodMatcher</node>
+    <node x="770.5" y="-93.0">org.springframework.aop.MethodMatcher</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.aop.support.DynamicMethodMatcher" target="org.springframework.aop.MethodMatcher" relationship="REALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="868.5" y="44.0" />
+      <point x="694.0" y="44.0" />
+      <point x="694.0" y="21.0" />
+      <point x="892.75" y="21.0" />
+      <point x="-42.25" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.IntroductionAwareMethodMatcher" target="org.springframework.aop.MethodMatcher" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="1199.0" y="28.5" />
+      <point x="977.25" y="28.5" />
+      <point x="42.25" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.support.StaticMethodMatcher" target="org.springframework.aop.MethodMatcher" relationship="REALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="528.0" y="44.0" />
+      <point x="694.0" y="44.0" />
+      <point x="694.0" y="21.0" />
+      <point x="892.75" y="21.0" />
+      <point x="-42.25" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="1196.0" y="239.0" />
+  <SelectedNodes>
+    <node>org.springframework.aop.IntroductionAwareMethodMatcher</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

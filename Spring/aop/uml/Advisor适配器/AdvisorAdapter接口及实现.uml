@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.springframework.aop.framework.adapter.AdvisorAdapter</OriginalElement>
+  <nodes>
+    <node x="0.0" y="78.0">org.springframework.aop.framework.adapter.MethodBeforeAdviceAdapter</node>
+    <node x="417.5" y="-68.0">org.springframework.aop.framework.adapter.AdvisorAdapter</node>
+    <node x="339.0" y="78.0">org.springframework.aop.framework.adapter.ThrowsAdviceAdapter</node>
+    <node x="671.0" y="78.0">org.springframework.aop.framework.adapter.AfterReturningAdviceAdapter</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.springframework.aop.framework.adapter.MethodBeforeAdviceAdapter" target="org.springframework.aop.framework.adapter.AdvisorAdapter" relationship="REALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="158.0" y="-16.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.framework.adapter.AfterReturningAdviceAdapter" target="org.springframework.aop.framework.adapter.AdvisorAdapter" relationship="REALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="820.0" y="78.0" />
+      <point x="820.0" y="-16.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.framework.adapter.ThrowsAdviceAdapter" target="org.springframework.aop.framework.adapter.AdvisorAdapter" relationship="REALIZATION">
+      <point x="0.0" y="-37.5" />
+      <point x="533.25" y="78.0" />
+      <point x="533.25" y="-16.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="533.0" y="210.0" />
+  <SelectedNodes>
+    <node>org.springframework.aop.framework.adapter.ThrowsAdviceAdapter</node>
+    <node>org.springframework.aop.framework.adapter.AfterReturningAdviceAdapter</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

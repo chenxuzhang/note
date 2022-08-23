@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>org.aopalliance.intercept.Joinpoint</OriginalElement>
+  <nodes>
+    <node x="263.0" y="35.0">org.aopalliance.intercept.Joinpoint</node>
+    <node x="354.5" y="256.5">org.aopalliance.intercept.ConstructorInvocation</node>
+    <node x="149.5" y="256.5">org.aopalliance.intercept.MethodInvocation</node>
+    <node x="263.0" y="157.0">org.aopalliance.intercept.Invocation</node>
+    <node x="85.0" y="348.0">org.springframework.aop.ProxyMethodInvocation</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="org.aopalliance.intercept.Invocation" target="org.aopalliance.intercept.Joinpoint" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="354.25" y="157.0" />
+      <point x="354.25" y="97.5" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="org.springframework.aop.ProxyMethodInvocation" target="org.aopalliance.intercept.MethodInvocation" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-81.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.aopalliance.intercept.MethodInvocation" target="org.aopalliance.intercept.Invocation" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="242.0" y="231.5" />
+      <point x="362.0" y="231.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+    <edge source="org.aopalliance.intercept.ConstructorInvocation" target="org.aopalliance.intercept.Invocation" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-26.5" />
+      <point x="482.0" y="231.5" />
+      <point x="362.0" y="231.5" />
+      <point x="0.0" y="26.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="1.0" showDependencies="false" x="660.0" y="392.0" />
+  <SelectedNodes>
+    <node>org.springframework.aop.ProxyMethodInvocation</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Fields</Category>
+    <Category>Inner Classes</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
