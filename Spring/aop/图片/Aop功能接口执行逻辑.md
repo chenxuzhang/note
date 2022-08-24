@@ -1,7 +1,7 @@
 ```
 接口执行逻辑只需要我们根据aop定义的接口进行功能的实现即可
 1、Advice接口
-    接口实现参考[Aop功能接口结构](https://github.com/chenxuzhang/note/blob/main/Spring/aop/%E5%9B%BE%E7%89%87/Aop%E5%8A%9F%E8%83%BD%E6%8E%A5%E5%8F%A3%E7%BB%93%E6%9E%84.md)
+    接口实现参考`Aop功能接口结构`
 
 2、Pointcut接口(含ClassFilter和MethodMatcher),spring也已提供了部分接口实现
     例如:
