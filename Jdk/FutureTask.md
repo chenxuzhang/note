@@ -1,4 +1,5 @@
 ```java
+//=========================================================================================
 // state状态变更以及状态之间的执行逻辑
 
 // NEW(调用构造器赋值) -> {Callable回调方法执行} -> COMPLETING(cas原子操作) -> {outcome属性赋值} -> NORMAL(修改最终状态) -> {唤醒因调用get方法而被park的线程}
@@ -8,6 +9,10 @@
 // NEW(调用构造器赋值) -> CANCELLED(cas原子操作) -> {唤醒因调用get方法而被park的线程}
 
 // NEW(调用构造器赋值) -> INTERRUPTING(cas原子操作) -> {调用执行run方法线程的interrupt()方法进行终端标记} -> INTERRUPTED(修改最终状态) -> {唤醒因调用get方法而被park的线程}
+//=========================================================================================
+
+
+
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
@@ -66,9 +71,6 @@ import java.util.concurrent.locks.LockSupport;
  * {@code protected} functionality that may be useful when creating
  * customized task classes.
  *
- * @since 1.5
- * @author Doug Lea
- * @param <V> The result type returned by this FutureTask's {@code get} methods
  */
 public class FutureTask<V> implements RunnableFuture<V> {
     /*
