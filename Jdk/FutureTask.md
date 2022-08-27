@@ -1,8 +1,8 @@
 ```java
 //↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-state状态变更以及状态之间的执行逻辑
+state状态转换及逻辑
 
-1.NEW -> COMPLETING -> NORMAL
+1.NEW -> COMPLETING -> NORMAL (正常的业务流状态转换)
 NEW(调用构造器赋值) 
 	-> {Callable回调方法执行} 
 		-> COMPLETING(cas原子操作,操作成功执行后续流程) 
@@ -10,7 +10,7 @@ NEW(调用构造器赋值)
 				-> NORMAL(修改最终状态) 
 					-> {唤醒因调用get方法而被park的线程}
 
-2.NEW -> COMPLETING -> EXCEPTIONAL
+2.NEW -> COMPLETING -> EXCEPTIONAL (执行Callable回调方法过程中抛异常的业务流状态转换)
 NEW(调用构造器赋值) 
 	-> {Callable回调方法执行} 
 		-> COMPLETING(cas原子操作,操作成功执行后续流程) 
@@ -18,12 +18,12 @@ NEW(调用构造器赋值)
 				-> EXCEPTIONAL(修改最终状态) 
 					-> {唤醒因调用get方法而被park的线程}
 
-3.NEW -> CANCELLED
+3.NEW -> CANCELLED (取消,只是设置了取消的状态,Callable可正常执行)
 NEW(调用构造器赋值) 
 	-> CANCELLED(cas原子操作,操作成功执行后续流程) 
 		-> {唤醒因调用get方法而被park的线程}
 
-4.NEW -> INTERRUPTING -> INTERRUPTED
+4.NEW -> INTERRUPTING -> INTERRUPTED (中断执行,会调用线程的interrupt()方法,run方法可以捕获线程中断标记)
 NEW(调用构造器赋值) 
 	-> INTERRUPTING(cas原子操作,操作成功执行后续流程) 
 		-> {调用执行run方法线程的interrupt()方法进行终端标记} 
@@ -31,65 +31,7 @@ NEW(调用构造器赋值)
 				-> {唤醒因调用get方法而被park的线程}
 //↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
 
-/*
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
- *
- * This code is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 only, as
- * published by the Free Software Foundation.  Oracle designates this
- * particular file as subject to the "Classpath" exception as provided
- * by Oracle in the LICENSE file that accompanied this code.
- *
- * This code is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- * version 2 for more details (a copy is included in the LICENSE file that
- * accompanied this code).
- *
- * You should have received a copy of the GNU General Public License version
- * 2 along with this work; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
- *
- * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
- * or visit www.oracle.com if you need additional information or have any
- * questions.
- */
 
-/*
- * This file is available under and governed by the GNU General Public
- * License version 2 only, as published by the Free Software Foundation.
- * However, the following notice accompanied the original version of this
- * file:
- *
- * Written by Doug Lea with assistance from members of JCP JSR-166
- * Expert Group and released to the public domain, as explained at
- * http://creativecommons.org/publicdomain/zero/1.0/
- */
-
-package java.util.concurrent;
-import java.util.concurrent.locks.LockSupport;
-
-/**
- * A cancellable asynchronous computation.  This class provides a base
- * implementation of {@link Future}, with methods to start and cancel
- * a computation, query to see if the computation is complete, and
- * retrieve the result of the computation.  The result can only be
- * retrieved when the computation has completed; the {@code get}
- * methods will block if the computation has not yet completed.  Once
- * the computation has completed, the computation cannot be restarted
- * or cancelled (unless the computation is invoked using
- * {@link #runAndReset}).
- *
- * <p>A {@code FutureTask} can be used to wrap a {@link Callable} or
- * {@link Runnable} object.  Because {@code FutureTask} implements
- * {@code Runnable}, a {@code FutureTask} can be submitted to an
- * {@link Executor} for execution.
- *
- * <p>In addition to serving as a standalone class, this class provides
- * {@code protected} functionality that may be useful when creating
- * customized task classes.
- *
- */
 public class FutureTask<V> implements RunnableFuture<V> {
     /*
      * Revision notes: This differs from previous versions of this
@@ -104,40 +46,36 @@ public class FutureTask<V> implements RunnableFuture<V> {
      */
 
     /**
-     * The run state of this task, initially NEW.  The run state
-     * transitions to a terminal state only in methods set,
-     * setException, and cancel.  During completion, state may take on
-     * transient values of COMPLETING (while outcome is being set) or
-     * INTERRUPTING (only while interrupting the runner to satisfy a
-     * cancel(true)). Transitions from these intermediate to final
+     * 下文解释了为什么使用UNSAFE.putOrderedInt(...)进行修改state状态值
+     * Transitions from these intermediate to final
      * states use cheaper ordered/lazy writes because values are unique
      * and cannot be further modified.
      *
-     * 状态变更的情况。
      * Possible state transitions:
-     * 1.NEW -> COMPLETING -> NORMAL    (正常执行并结束)
-     * 2.NEW -> COMPLETING -> EXCEPTIONAL   (正常执行并结束)
-     * 3.NEW -> CANCELLED   (取消,只是设置了取消的状态,run方法中call依旧可以正常执行,但是执行完后会抛出 CancellationException 异常)
-     * 4.NEW -> INTERRUPTING -> INTERRUPTED (中断执行,会调用线程的interrupt()方法,run方法可以捕获线程中断标记)
+     * NEW -> COMPLETING -> NORMAL	
+     * NEW -> COMPLETING -> EXCEPTIONAL
+     * NEW -> CANCELLED	
+     * NEW -> INTERRUPTING -> INTERRUPTED	
      */
     private volatile int state;
     private static final int NEW          = 0; // 初始化状态
-    private static final int COMPLETING   = 1; // 介于 正常执行完成和异常中间的一个状态
+    private static final int COMPLETING   = 1; // 瞬时状态,介于 NORMAL 或 EXCEPTIONAL 中间的一个状态
     private static final int NORMAL       = 2; // 正常执行完成
     private static final int EXCEPTIONAL  = 3; // 抛异常了
     private static final int CANCELLED    = 4; // 取消,取消没有中间状态
-    private static final int INTERRUPTING = 5; // 中断中,是已中断状态的一个中间状态
+    private static final int INTERRUPTING = 5; // 瞬时状态,中断中,是 INTERRUPTED 的一个中间状态
     private static final int INTERRUPTED  = 6; // 已中断
-    // 取消、中断、异常、正常完成 这几个动作都是基于NEW状态做cas原子操作。
-    // 
 
     /** The underlying callable; nulled out after running */
     private Callable<V> callable;
     /** The result to return or exception to throw from get() */
+  	/** 用于暂存正常流程的处理结果 或 异常情况的堆栈信息 */
     private Object outcome; // non-volatile, protected by state reads/writes
     /** The thread running the callable; CASed during run() */
+  	/** 调用并运行 run() 方法的线程,执行 Callable 回调方法中的自定义业务  */
     private volatile Thread runner;
     /** Treiber stack of waiting threads */
+    /** 调用 get(...) 方法被park的多个线程节点  */
     private volatile WaitNode waiters;
 
     /**
@@ -149,11 +87,11 @@ public class FutureTask<V> implements RunnableFuture<V> {
     @SuppressWarnings("unchecked")
     private V report(int s) throws ExecutionException {
         Object x = outcome;
-        if (s == NORMAL)
+        if (s == NORMAL) // 此状态,表示业务执行完毕,中间没遇到取消、中断、异常情况,outcome 会暂存 Callable 回调方法返回值。
             return (V)x;
-        if (s >= CANCELLED)
+        if (s >= CANCELLED) // 大于等于 CANCELLED,会有 CANCELLED、INTERRUPTING、INTERRUPTED 状态。
             throw new CancellationException();
-        throw new ExecutionException((Throwable)x);
+        throw new ExecutionException((Throwable)x); // 剩下的只有 EXCEPTIONAL 情况了,需要抛出异常。
     }
 
     /**
@@ -186,11 +124,15 @@ public class FutureTask<V> implements RunnableFuture<V> {
         this.callable = Executors.callable(runnable, result);
         this.state = NEW;       // ensure visibility of callable
     }
-
+		// 大于等于 CANCELLED,会有 CANCELLED、INTERRUPTING、INTERRUPTED 状态。
     public boolean isCancelled() {
         return state >= CANCELLED;
     }
-
+		// 不等于 NEW,会有 NORMAL(含COMPLETING)、EXCEPTIONAL(含COMPLETING)、CANCELLED、INTERRUPTED(含INTERRUPTING) 状态。
+  	// NORMAL(含COMPLETING):表示 Callable 业务已经执行完毕了。
+  	// EXCEPTIONAL(含COMPLETING):表示 Callable 业务执行过程中抛异常了。
+  	// CANCELLED:表示已经成功发起了取消操作。
+  	// INTERRUPTED(含INTERRUPTING):表示已成功发起了中断操作。
     public boolean isDone() {
         return state != NEW;
     }
