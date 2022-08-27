@@ -128,16 +128,19 @@ public class FutureTask<V> implements RunnableFuture<V> {
     public boolean isCancelled() {
         return state >= CANCELLED;
     }
-		// 不等于 NEW,会有 NORMAL(含COMPLETING)、EXCEPTIONAL(含COMPLETING)、CANCELLED、INTERRUPTED(含INTERRUPTING) 状态。
-  	// NORMAL(含COMPLETING):表示 Callable 业务已经执行完毕了。
-  	// EXCEPTIONAL(含COMPLETING):表示 Callable 业务执行过程中抛异常了。
-  	// CANCELLED:表示已经成功发起了取消操作。
-  	// INTERRUPTED(含INTERRUPTING):表示已成功发起了中断操作。
+    // 不等于 NEW,会有 NORMAL(含COMPLETING)、EXCEPTIONAL(含COMPLETING)、CANCELLED、INTERRUPTED(含INTERRUPTING) 状态。
+    // NORMAL(含COMPLETING):表示 Callable 业务已经执行完毕了。
+    // EXCEPTIONAL(含COMPLETING):表示 Callable 业务执行过程中抛异常了。
+    // CANCELLED:表示已经成功发起了取消操作。
+    // INTERRUPTED(含INTERRUPTING):表示已成功发起了中断操作。
     public boolean isDone() {
         return state != NEW;
     }
-
+    // mayInterruptIfRunning true:如果正在运行,可能会中断
+    // 取消和中断,参数传true为中断,参数为false为取消
     public boolean cancel(boolean mayInterruptIfRunning) {
+        // 此判断 基于cas操作,由 NEW 状态切换为 INTERRUPTING 或 CANCELLED。
+        // 如果切换cas执行成功,就意味着 state 不能切换为 COMPLETING 状态,即便是 Callable 逻辑执行完毕。
         if (!(state == NEW &&
                 UNSAFE.compareAndSwapInt(this, stateOffset, NEW,
                         mayInterruptIfRunning ? INTERRUPTING : CANCELLED)))
@@ -145,25 +148,29 @@ public class FutureTask<V> implements RunnableFuture<V> {
         try {    // in case call to interrupt throws exception
             if (mayInterruptIfRunning) {
                 try {
-                    Thread t = runner;
+                    Thread t = runner; // 调用 run() 方法的线程,在 run() 方法中基于cas进行设置的。
                     if (t != null)
                         t.interrupt();
                 } finally { // final state
+                    // INTERRUPTING -> INTERRUPTED 状态转换,putOrderedInt 执行具有惰性的?
                     UNSAFE.putOrderedInt(this, stateOffset, INTERRUPTED);
                 }
             }
         } finally {
+            // 唤醒 WaitNode 等待线程节点,是个单链表结构。
             finishCompletion();
         }
+        // 表示成功触发了 中断 或 取消
         return true;
     }
 
     /**
-     * @throws CancellationException {@inheritDoc}
-     * 
+     * 获取 线程执行run()方法的结果 或 线程执行run()方法的异常信息 或 取消异常 或 中断异常
+     * 此方法支持多线程调用,等待执行 run() 线程执行结束
      */
     public V get() throws InterruptedException, ExecutionException {
         int s = state;
+      	// 小于等于 COMPLETING,有 NEW、COMPLETING 状态
         if (s <= COMPLETING)
             s = awaitDone(false, 0L);
         return report(s);
@@ -184,6 +191,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
     }
 
     /**
+     * 钩子方法,在执行完 finishCompletion 方法后调用
      * Protected method invoked when this task transitions to state
      * {@code isDone} (whether normally or via cancellation). The
      * default implementation does nothing.  Subclasses may override
@@ -195,6 +203,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
     protected void done() { }
 
     /**
+     * NEW -> COMPLETING -> NORMAL 流程
      * Sets the result of this future to the given value unless
      * this future has already been set or has been cancelled.
      *
@@ -207,11 +216,12 @@ public class FutureTask<V> implements RunnableFuture<V> {
         if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
             outcome = v;
             UNSAFE.putOrderedInt(this, stateOffset, NORMAL); // final state
-            finishCompletion();
+            finishCompletion(); // 唤醒 WaitNode 等待线程节点,是个单链表结构。
         }
     }
 
     /**
+     * NEW -> COMPLETING -> EXCEPTIONAL 流程
      * Causes this future to report an {@link ExecutionException}
      * with the given throwable as its cause, unless this future has
      * already been set or has been cancelled.
@@ -225,34 +235,41 @@ public class FutureTask<V> implements RunnableFuture<V> {
         if (UNSAFE.compareAndSwapInt(this, stateOffset, NEW, COMPLETING)) {
             outcome = t;
             UNSAFE.putOrderedInt(this, stateOffset, EXCEPTIONAL); // final state
-            finishCompletion();
+            finishCompletion(); // 唤醒 WaitNode 等待线程节点,是个单链表结构。
         }
     }
 
     public void run() {
+      	// 如果 state 为 CANCELLED 或者 INTERRUPTED(INTERRUPTING) 状态,退出执行
+      	// COMPLETING、NORMAL、EXCEPTIONAL 状态,在 run() 方法内部才会更改     
+      	// 将 runner 更新为 Thread.currentThread(),那个线程执行 run() 方法,runner 代表的是对应线程      
         if (state != NEW ||
                 !UNSAFE.compareAndSwapObject(this, runnerOffset,
                         null, Thread.currentThread()))
             return;
         try {
             Callable<V> c = callable;
-            if (c != null && state == NEW) {
+            // 在判断执行之前执行 cancel(...) 方法,才能中断 或 取消 Callable 业务执行。
+            if (c != null && state == NEW) { 
+                //
+                //
                 V result;
                 boolean ran;
                 try {
-                    result = c.call();
+                    result = c.call(); // 执行自定义的业务逻辑
                     ran = true;
                 } catch (Throwable ex) {
                     result = null;
                     ran = false;
-                    setException(ex);
+                    setException(ex); // 自定义业务抛异常,则执行 NEW -> COMPLETING -> EXCEPTIONAL 状态变更及逻辑
                 }
-                if (ran)
+                if (ran) // 自定义业务执行完成,并且无异常,则执行 NEW -> COMPLETING -> NORMAL 状态变更及逻辑
                     set(result);
             }
         } finally {
             // runner must be non-null until state is settled to
             // prevent concurrent calls to run()
+            // 中断操作的时候,会调用 runner.interrupt() 方法。在此之前执行 中断 操作才有意义。
             runner = null;
             // state must be re-read after nulling runner to prevent
             // leaked interrupts
@@ -365,6 +382,10 @@ public class FutureTask<V> implements RunnableFuture<V> {
 
     /**
      * Awaits completion or aborts on interrupt or timeout.
+     * 
+     *
+     *
+     * state只有等于 NEW、COMPLETING 状态的时候,才会执行 awaitDone(...) 业务逻辑
      *
      * @param timed true if use timed waits
      * @param nanos time to wait, if timed
