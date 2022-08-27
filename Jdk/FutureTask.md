@@ -384,9 +384,9 @@ public class FutureTask<V> implements RunnableFuture<V> {
                     Thread t = q.thread;
                     if (t != null) {
                         q.thread = null; // 置空,释放
-                        LockSupport.unpark(t);
+                        LockSupport.unpark(t); // 线程 unpark 结束等待状态,等CPU进行调度
                     }
-                    WaitNode next = q.next;
+                    WaitNode next = q.next; // 处理下个 WaitNode 节点,如果有的话
                     if (next == null)
                         break;
                     q.next = null; // unlink to help gc
@@ -427,6 +427,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
             int s = state;
             // state 大于 COMPLETING,会有 NORMAL、EXCEPTIONAL、CANCELLED、INTERRUPTING、INTERRUPTED 状态
             // 这些状态意味着 调用 run() 方法线程执行完毕(正常 or 抛异常) 或者 已取消 或者 正在中断 或者 已经中断
+            // 每次循环第一步就是判断 stage 状态,如果 大于 COMPLETING,则return
             if (s > COMPLETING) {
                 if (q != null) // 默认 q 是空的,如果为空,则创建 WaitNode 实例,并赋值给 q 变量
                     q.thread = null; // 释放
