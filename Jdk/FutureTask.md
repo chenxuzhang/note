@@ -1,4 +1,13 @@
 ```java
+    // state状态变更以及状态之间的执行逻辑
+
+    // NEW(调用构造器赋值) -> {Callable回调方法执行} -> COMPLETING(cas原子操作) -> {outcome属性赋值} -> NORMAL(修改最终状态) -> {唤醒因调用get方法而被park的线程}
+
+    // NEW(调用构造器赋值) -> {Callable回调方法执行} -> COMPLETING(cas原子操作) -> {outcome属性赋值} -> EXCEPTIONAL(修改最终状态) -> {唤醒因调用get方法而被park的线程}
+
+    // NEW(调用构造器赋值) -> CANCELLED(cas原子操作) -> {唤醒因调用get方法而被park的线程}
+
+    // NEW(调用构造器赋值) -> INTERRUPTING(cas原子操作) -> {调用执行run方法线程的interrupt()方法进行终端标记} -> INTERRUPTED(修改最终状态) -> {唤醒因调用get方法而被park的线程}
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
@@ -84,20 +93,23 @@ public class FutureTask<V> implements RunnableFuture<V> {
      * states use cheaper ordered/lazy writes because values are unique
      * and cannot be further modified.
      *
+     * 状态变更的情况。
      * Possible state transitions:
-     * NEW -> COMPLETING -> NORMAL
-     * NEW -> COMPLETING -> EXCEPTIONAL
-     * NEW -> CANCELLED
-     * NEW -> INTERRUPTING -> INTERRUPTED
+     * 1.NEW -> COMPLETING -> NORMAL    (正常执行并结束)
+     * 2.NEW -> COMPLETING -> EXCEPTIONAL   (正常执行并结束)
+     * 3.NEW -> CANCELLED   (取消,只是设置了取消的状态,run方法中call依旧可以正常执行,但是执行完后会抛出 CancellationException 异常)
+     * 4.NEW -> INTERRUPTING -> INTERRUPTED (中断执行,会调用线程的interrupt()方法,run方法可以捕获线程中断标记)
      */
     private volatile int state;
-    private static final int NEW          = 0;
-    private static final int COMPLETING   = 1;
-    private static final int NORMAL       = 2;
-    private static final int EXCEPTIONAL  = 3;
-    private static final int CANCELLED    = 4;
-    private static final int INTERRUPTING = 5;
-    private static final int INTERRUPTED  = 6;
+    private static final int NEW          = 0; // 初始化状态
+    private static final int COMPLETING   = 1; // 介于 正常执行完成和异常中间的一个状态
+    private static final int NORMAL       = 2; // 正常执行完成
+    private static final int EXCEPTIONAL  = 3; // 抛异常了
+    private static final int CANCELLED    = 4; // 取消,取消没有中间状态
+    private static final int INTERRUPTING = 5; // 中断中,是已中断状态的一个中间状态
+    private static final int INTERRUPTED  = 6; // 已中断
+    // 取消、中断、异常、正常完成 这几个动作都是基于NEW状态做cas原子操作。
+    // 
 
     /** The underlying callable; nulled out after running */
     private Callable<V> callable;
@@ -110,7 +122,8 @@ public class FutureTask<V> implements RunnableFuture<V> {
 
     /**
      * Returns result or throws exception for completed task.
-     *
+     * 根据state状态,获取run方法执行完后的返回结果
+     *  
      * @param s completed state value
      */
     @SuppressWarnings("unchecked")
@@ -185,6 +198,7 @@ public class FutureTask<V> implements RunnableFuture<V> {
 
     /**
      * @throws CancellationException {@inheritDoc}
+     * 
      */
     public V get() throws InterruptedException, ExecutionException {
         int s = state;
