@@ -69,10 +69,10 @@ public class FutureTask<V> implements RunnableFuture<V> {
     /** The underlying callable; nulled out after running */
     private Callable<V> callable;
     /** The result to return or exception to throw from get() */
-		/** 用于暂存正常流程的处理结果 或 异常情况的堆栈信息 */
+    /** 用于暂存正常流程的处理结果 或 异常情况的堆栈信息 */
     private Object outcome; // non-volatile, protected by state reads/writes
     /** The thread running the callable; CASed during run() */
-		/** 调用并运行 run() 方法的线程,执行 Callable 回调方法中的自定义业务  */
+    /** 调用并运行 run() 方法的线程,执行 Callable 回调方法中的自定义业务  */
     private volatile Thread runner;
     /** Treiber stack of waiting threads */
     /** 调用 get(...) 方法被park的多个线程节点  */
