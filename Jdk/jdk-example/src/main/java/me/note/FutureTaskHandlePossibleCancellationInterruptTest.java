@@ -3,14 +3,12 @@ package me.note;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class FutureTaskHandlePossibleCancellationInterruptTest {
 
     public static void main(String[] args) throws InterruptedException {
-        test1();
+        test2();
 
     }
 
@@ -106,7 +104,42 @@ public class FutureTaskHandlePossibleCancellationInterruptTest {
     /**
      * TODO 线程池例子
      */
-    public static void test2() {
+    public static void test2() throws InterruptedException {
+        /**
+         * 代码及解释
+         * ThreadPoolExecutor
+         *  runWorker(...) 方法
+         *   // If pool is stopping, ensure thread is interrupted;
+         *   // if not, ensure thread is not interrupted.  This
+         *   // requires a recheck in second case to deal with
+         *   // shutdownNow race while clearing interrupt
+         *   if ((runStateAtLeast(ctl.get(), STOP) || (Thread.interrupted() && runStateAtLeast(ctl.get(), STOP))) && !wt.isInterrupted())
+         *      wt.interrupt();
+         *
+         */
         // 线程池应该解决问题了。。。。
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(1, 1, 1, TimeUnit.MINUTES, new LinkedBlockingQueue<>());
+
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(Thread.currentThread().isInterrupted());
+            }
+        });
+        threadPoolExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                System.out.println(Thread.currentThread().isInterrupted());
+            }
+        });
+
+        TimeUnit.SECONDS.sleep(60);
     }
 }
