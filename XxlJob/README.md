@@ -14,5 +14,8 @@
 
 [7、任务调度成功后异常情况数据补偿](https://github.com/chenxuzhang/note/blob/main/XxlJob/%E4%BB%BB%E5%8A%A1%E8%B0%83%E5%BA%A6%E6%88%90%E5%8A%9F%E5%90%8E%E5%BC%82%E5%B8%B8%E6%83%85%E5%86%B5%E6%95%B0%E6%8D%AE%E8%A1%A5%E5%81%BF.md)
 
+[8、@XxlJob配置抽象出IJobHandler](https://github.com/chenxuzhang/note/blob/main/XxlJob/%40XxlJob%E9%85%8D%E7%BD%AE%E6%8A%BD%E8%B1%A1%E5%87%BAIJobHandler.md)
+
+[9、JobThread](https://github.com/chenxuzhang/note/blob/main/XxlJob/JobThread.md)
 
 [//]: # ([2、]&#40;https://github.com/chenxuzhang/note/blob/main/Spring/aop/%E5%9B%BE%E7%89%87/Aop%E5%8A%9F%E8%83%BD%E6%8E%A5%E5%8F%A3%E6%89%A7%E8%A1%8C%E9%80%BB%E8%BE%91.md&#41;)
