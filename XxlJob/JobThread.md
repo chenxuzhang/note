@@ -1,3 +1,123 @@
+##### JobThread方法调用栈
+
+```java
+1、XxlJobExecutor.start() // 可由 XxlJobSpringExecutor 或 XxlJobSimpleExecutor 调用触发
+ 2、XxlJobExecutor.initEmbedServer()
+  3、new EmbedServer().start();
+   4、Netty ServerBootstrap 监听任务调度消息
+    5、new EmbedHttpServerHandler().process() 接收 /run 请求
+     6、new ExecutorBizImpl().run(...)
+      // 注册并启动JobThread(如果有已经注册的JobThread,将原有的删除掉,再新增)
+      XxlJobExecutor.registJobThread(...) 
+      // 调用JobThread 向队列添加任务的方法
+      jobThread.pushTriggerQueue(...); 
+```
+
+##### JobThread方法调用逻辑 new ExecutorBizImpl().run(...)
+
+```java
+// 由Netty 接受请求并调用此方法
+public ReturnT<String> run(TriggerParam triggerParam) {
+ // load old：jobHandler + jobThread
+ JobThread jobThread = XxlJobExecutor.loadJobThread(triggerParam.getJobId());
+ IJobHandler jobHandler = jobThread!=null?jobThread.getHandler():null;
+ String removeOldReason = null;
+
+ // valid：jobHandler + jobThread
+ GlueTypeEnum glueTypeEnum = GlueTypeEnum.match(triggerParam.getGlueType());
+ if (GlueTypeEnum.BEAN == glueTypeEnum) {
+  // new jobhandler 对应执行器服务配置的@XxlJob注解方法,在执行器服务启动的时候由xxl进行加载并注册进内存中 参考"@XxlJob配置抽象出IJobHandler.md"
+  IJobHandler newJobHandler = XxlJobExecutor.loadJobHandler(triggerParam.getExecutorHandler());
+
+  // valid old jobThread
+  if (jobThread!=null && jobHandler != newJobHandler) { // change jobhandler or glue type 导致handler不一致,需要重新构建对应关系
+   // change handler, need kill old thread
+   removeOldReason = "change jobhandler or glue type, and terminate the old job thread.";
+
+   jobThread = null;
+   jobHandler = null;
+  }
+
+  // valid handler
+  if (jobHandler == null) {
+   jobHandler = newJobHandler;
+   if (jobHandler == null) {
+    return new ReturnT<String>(ReturnT.FAIL_CODE, "job handler [" + triggerParam.getExecutorHandler() + "] not found.");
+   }
+  }
+ } else if (GlueTypeEnum.GLUE_GROOVY == glueTypeEnum) {
+  // valid old jobThread GLUE更新时间不一致,代表GLUE改变了,需要重新加载
+  if (jobThread != null &&
+    !(jobThread.getHandler() instanceof GlueJobHandler
+       && ((GlueJobHandler) jobThread.getHandler()).getGlueUpdatetime()==triggerParam.getGlueUpdatetime() )) {
+   // change handler or gluesource updated, need kill old thread
+   removeOldReason = "change job source or glue type, and terminate the old job thread.";
+
+   jobThread = null;
+   jobHandler = null;
+  }
+
+  // valid handler
+  if (jobHandler == null) {
+   try {
+    IJobHandler originJobHandler = GlueFactory.getInstance().loadNewInstance(triggerParam.getGlueSource());
+    jobHandler = new GlueJobHandler(originJobHandler, triggerParam.getGlueUpdatetime());
+   } catch (Exception e) {
+    logger.error(e.getMessage(), e);
+    return new ReturnT<String>(ReturnT.FAIL_CODE, e.getMessage());
+   }
+  }
+ } else if (glueTypeEnum!=null && glueTypeEnum.isScript()) {
+  // valid old jobThread 同上
+  if (jobThread != null &&
+     !(jobThread.getHandler() instanceof ScriptJobHandler
+        && ((ScriptJobHandler) jobThread.getHandler()).getGlueUpdatetime()==triggerParam.getGlueUpdatetime() )) {
+                // change script or gluesource updated, need kill old thread
+   removeOldReason = "change job source or glue type, and terminate the old job thread.";
+   jobThread = null;
+   jobHandler = null;
+  }
+
+  // valid handler
+  if (jobHandler == null) {
+   jobHandler = new ScriptJobHandler(triggerParam.getJobId(), triggerParam.getGlueUpdatetime(), triggerParam.getGlueSource(), GlueTypeEnum.match(triggerParam.getGlueType()));
+  }
+ } else {
+  return new ReturnT<String>(ReturnT.FAIL_CODE, "glueType[" + triggerParam.getGlueType() + "] is not valid.");
+ }
+
+ // executor block strategy
+ // 缓存的任务线程,校验任务配置的 阻塞处理策略
+ if (jobThread != null) {
+  ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(triggerParam.getExecutorBlockStrategy(), null);
+  if (ExecutorBlockStrategyEnum.DISCARD_LATER == blockStrategy) {
+   // discard when running
+   if (jobThread.isRunningOrHasQueue()) {
+    return new ReturnT<String>(ReturnT.FAIL_CODE, "block strategy effect："+ExecutorBlockStrategyEnum.DISCARD_LATER.getTitle());
+   }
+  } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
+   // kill running jobThread
+   if (jobThread.isRunningOrHasQueue()) {
+    removeOldReason = "block strategy effect：" + ExecutorBlockStrategyEnum.COVER_EARLY.getTitle();
+    jobThread = null;
+   }
+  } else {
+   // just queue trigger
+  }
+ }
+
+ // replace thread (new or exists invalid)
+ // 添加新任务线程(jobHandler也是新的,任务线程和任务处理器是通过任务线程构造器绑定的)同时,终止旧任务线程。
+ if (jobThread == null) {
+  jobThread = XxlJobExecutor.registJobThread(triggerParam.getJobId(), jobHandler, removeOldReason);
+ }
+
+ // 将新任务参数丢进任务线程队列,由任务线程异步执行
+ ReturnT<String> pushResult = jobThread.pushTriggerQueue(triggerParam);
+ return pushResult;
+}
+```
+
 ##### JobThread业务逻辑
 
 ```java
