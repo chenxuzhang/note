@@ -20,8 +20,8 @@ public final void acquire(long arg) {
   // 获取失败,addWaiter(Node.EXCLUSIVE) 构建带有哨兵节点的链表结构同步队列(以独占锁模式将当前线程构建为Node对象)
   // acquireQueued(...) 线程排队获取独占锁,在有限时间内线程可获取执行权
   if (!tryAcquire(arg) && acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
-    // acquireQueued(...) 返回false表示某线程获取了执行权,但是线程被中断了
-    selfInterrupt();
+    // acquireQueued(...) 返回false表示线程等待期间未被中断。返回true表示线程等待期间被中断。
+    selfInterrupt(); // 当前线程写入中断标记,park阻塞下一行代码会清除中断标记,此处重新标记中断状态告知线程。
 }
 // 以独占锁模式尝试获取,由子类实现
 protected boolean tryAcquire(int arg) { throw new UnsupportedOperationException(); }
@@ -76,7 +76,7 @@ final boolean acquireQueued(final Node node, long arg) {
       }
       // 线程未获取执行权,需要在前节点设置waitStatus(node节点只关心前任的waitStatus状态),然后执行线程需要park操作,等待其他唤醒
       if (shouldParkAfterFailedAcquire(p, node) && parkAndCheckInterrupt())
-        interrupted = true;
+        interrupted = true; // parkAndCheckInterrupt() 会清除中断标记,此处用变量标记,后续重新给线程标记中断状态。
     }
   } finally {
     if (failed)
@@ -106,7 +106,7 @@ private static boolean shouldParkAfterFailedAcquire(Node pred, Node node) {
 // 线程 park。unpark后,检查线程是否中断(清除中断标记,外层根据状态进行再次中断)
 private final boolean parkAndCheckInterrupt() {
   LockSupport.park(this);
-  return Thread.interrupted();
+  return Thread.interrupted(); // 判断是否中断,同时清除中断标记。
 }
 // 释放线程的执行权
 public final boolean release(long arg) {
