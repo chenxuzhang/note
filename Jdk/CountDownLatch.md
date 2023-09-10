@@ -23,7 +23,7 @@ private static final class Sync extends AbstractQueuedSynchronizer {
   Sync(int count) { setState(count); }
   // state只锚定是否等于0,不等于0,需要进入同步等待队列排队。等于0,不需要等待直接获取执行权。
   protected int tryAcquireShared(int acquires) { return (getState() == 0) ? 1 : -1; }
-	// 当state-1等于0的时候才能唤醒同步等待队列中的线程,且只能主动唤醒同步队列线程一次,后续唤醒全是依赖head节点waitStatus(PROPAGATE = -3)此状态进行传播唤醒。
+  // 当state-1等于0的时候才能唤醒同步等待队列中的线程,且只能主动唤醒同步队列线程一次,后续唤醒全是依赖head节点waitStatus(PROPAGATE = -3)此状态进行传播唤醒。
   protected boolean tryReleaseShared(int releases) {
     // Decrement count; signal when transition to zero
     for (;;) {
